@@ -9,10 +9,13 @@ def parseLine(line):
     numFriends = int(fields[3])
     return (age, numFriends)
 
-lines = sc.textFile("file:///SparkCourse/fakefriends.csv") # ID, name, age, number of friends
+lines = sc.textFile("./fakefriends.csv") # ID, name, age, number of friends
+# tuple = (key, value)
 rdd = lines.map(parseLine)
 
 totalsByAge = rdd.mapValues(lambda x: (x, 1)).reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1]))
+# reduceByKey will apply function to value for each unique key
+
 averagesByAge = totalsByAge.mapValues(lambda x: x[0] / x[1])
 results = averagesByAge.collect()
 for result in results:
