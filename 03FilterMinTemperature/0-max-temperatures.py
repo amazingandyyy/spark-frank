@@ -1,6 +1,6 @@
 from pyspark import SparkConf, SparkContext
 
-conf = SparkConf().setMaster("local").setAppName("MinTemperature")
+conf = SparkConf().setMaster("local").setAppName("MaxTemperature")
 sc = SparkContext(conf = conf)
 
 def parseLine(line):
@@ -12,13 +12,13 @@ def parseLine(line):
 
 lines = sc.textFile("./1800.csv")
 rdd = lines.map(parseLine)
-stationMinTemps = rdd.filter(lambda x: "TMIN" in x[1]).map(lambda x: (x[0], x[2])) # only left TMIN and remove entryType
+stationMaxTemps = rdd.filter(lambda x: "TMAX" in x[1]).map(lambda x: (x[0], x[2]))
 
-minTemps = stationMinTemps.reduceByKey(lambda x, y: min(x,y))
+maxTemps = stationMaxTemps.reduceByKey(lambda x, y: max(x,y))
 # reduceByKey will apply function to value for each unique key
 
-results = minTemps.collect()
+results = maxTemps.collect()
 
-print("Min Temp of the year:")
+print("Max Temp of the year:")
 for result in results:
     print(result[0] + "\t{:.3f}C".format(result[1]))
